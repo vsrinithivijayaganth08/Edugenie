@@ -1,11 +1,9 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 
-# --- GEMINI SETUP ---
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-flash')
+# --- GEMINI SETUP (PUDHU LIBRARY) ---
+client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
-# --- WEBSITE UI ---
 st.set_page_config(page_title="EduGenie", page_icon="🎓")
 st.title("🎓 EduGenie")
 st.write("Google Gemini Powered Learning Assistant")
@@ -29,6 +27,9 @@ if prompt := st.chat_input("Un doubt enna?"):
     
     with st.chat_message("assistant"):
         full_prompt = f"Explain this for a {std} in {subject} subject. Question: {prompt}. Explain in Tanglish (Tamil + English mix), simple ah."
-        response = model.generate_content(full_prompt)
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=full_prompt
+        )
         st.markdown(response.text)
         st.session_state.messages.append({"role": "assistant", "content": response.text})
