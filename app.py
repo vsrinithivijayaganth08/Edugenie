@@ -1,31 +1,34 @@
 import streamlit as st
 import google.generativeai as genai
 
+# --- GEMINI SETUP ---
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel('gemini-1.5-flash')
 
+# --- WEBSITE UI ---
 st.set_page_config(page_title="EduGenie", page_icon="🎓")
 st.title("🎓 EduGenie")
-st.subheader("Google Gemini Powered Learning Assistant")
+st.write("Google Gemini Powered Learning Assistant")
 
-st.sidebar.header("Settings")
-level = st.sidebar.selectbox("Yaarukku explain pannanum?", ["6th Std Student", "College Student", "Expert"])
+with st.sidebar:
+    st.header("Settings")
+    std = st.selectbox("Yaarukku explain pannanum?", ["6th Std Student", "10th Std Student", "College Student"])
+    subject = st.selectbox("Enna subject?", ["General", "Science", "Maths", "Social"])
 
-if "chat" not in st.session_state:
-    st.session_state.chat = []
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-user_input = st.chat_input("Un doubt enna?")
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
-if user_input:
-    st.session_state.chat.append(("user", user_input))
-    prompt = f"You are EduGenie. Explain '{user_input}' for {level} level in simple steps. Use Tanglish."
-    response = model.generate_content(prompt)
-    answer = response.text
-    st.session_state.chat.append(("ai", answer))
-
-for role, msg in st.session_state.chat:
-    if role == "user":
-        st.chat_message("user").write(msg)
-    else:
-        st.chat_message("assistant").write(msg)
-        
+if prompt := st.chat_input("Un doubt enna?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    
+    with st.chat_message("assistant"):
+        full_prompt = f"Explain this for a {std} in {subject} subject. Question: {prompt}. Explain in Tanglish (Tamil + English mix), simple ah."
+        response = model.generate_content(full_prompt)
+        st.markdown(response.text)
+        st.session_state.messages.append({"role": "assistant", "content": response.text})
