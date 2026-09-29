@@ -28,3 +28,4 @@ for role, msg in st.session_state.chat:
         st.chat_message("user").write(msg)
     else:
         st.chat_message("assistant").write(msg)
+        
