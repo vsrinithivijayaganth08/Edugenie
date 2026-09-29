@@ -21,7 +21,7 @@ if prompt := st.chat_input("Un doubt enna ketu?"):
     with st.chat_message("assistant"):
         try:
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-1.5-flash",
                 contents=f"Explain in Tanglish for 10th std student: {prompt}"
             )
             ans = response.text
