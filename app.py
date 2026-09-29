@@ -1,7 +1,6 @@
 import streamlit as st
 from google import genai
 
-# --- GEMINI SETUP (PUDHU LIBRARY) ---
 client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 
 st.set_page_config(page_title="EduGenie", page_icon="🎓")
@@ -24,12 +23,8 @@ if prompt := st.chat_input("Un doubt enna?"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-    
     with st.chat_message("assistant"):
-        full_prompt = f"Explain this for a {std} in {subject} subject. Question: {prompt}. Explain in Tanglish (Tamil + English mix), simple ah."
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=full_prompt
-        )
+        full_prompt = f"Explain for a {std} in {subject}. Question: {prompt}. Explain in Tanglish simple ah."
+        response = client.models.generate_content(model="gemini-2.0-flash", contents=full_prompt)
         st.markdown(response.text)
         st.session_state.messages.append({"role": "assistant", "content": response.text})
